@@ -102,11 +102,34 @@ function initMap(position) {
 	getLoc();
 	
 	
-	
+	cluster(map, "cluster-1", "cluster-2", "cluster-3", function(cluster) {
+		$.ajax({
+			type: 'GET',
+			url: 'https://openapi.starbucks.com/location/v1/stores?radius=10&limit=50&brandCode=SBUX&latLng=' + position.lat + '%2C' + position.lng + '&apikey=7b35m595vccu6spuuzu2rjh4',
+			dataType: 'json',
+			headers: {
+				'Accept': 'application/json'
+			},
+			success: function(storesData) {
+				var array = storesData.items;
+				for(var i=0; i<array.length; i+=1) {
+					var pos = array[i].store.coordinates;
+					addMarker(map, cluster, {
+						position: {'lat' : pos.latitude, 'lng':pos.longitude}
+					}, "<div class='infowindow store'>Starbucks</div>");
+				}
+			},
+			error:function(jqXHR, textStatus, errorThrown){
+				alert("error");
+			}
+		});
+	});
+
 	 
 	setInterval(function() {
 		setInfoWindow("request");
 		setInfoWindow("teach");
+		setInfoWindow("store");
 	}, 100);
 }
 
@@ -139,7 +162,7 @@ $(document).ready(function() {
 		navigator.geolocation.getCurrentPosition(function (pos) {
 
 			initMap({'lat':pos.coords.latitude, 'lng':pos.coords.longitude});
-
+			
 		}, function (error) {
 			
 			initMap(defLocation);
