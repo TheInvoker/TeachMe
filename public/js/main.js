@@ -1,34 +1,31 @@
+function addMarker(map, cluster, marker, content) {
+	map.marker(marker).then(function(marker) {
+		map.infowindow({
+			'content' : content
+		})
+		.then(function (infowindow) {
+			var map = this.get(0);
+			marker.addListener('click', function(event, data) {
+				infowindow.open(map, this);
+			});
+		});
+		
+		cluster.add(marker);
+	});
+}
+
 $(document).ready(function() {
 	
 	var uluru = {lat: -25.363, lng: 131.044};
+	
     var map = $('#map')
       .gmap3({
         zoom: 4,
         center: uluru
       });
 	  
-      map.marker({
-        position: uluru
-      })
-      .infowindow({
-        content: "text"
-      })
-      .then(function (infowindow) {
-        var map = this.get(0);
-        var marker = this.get(1);
-        marker.addListener('click', function() {
-          infowindow.open(map, marker);
-        });
-      });
-	  
       map.cluster({
           size: 200,
-          markers: [
-            {position: [48.8620722, 2.352047]},
-            {position: [44.28952958093682, 6.152559438984804], icon: "http://maps.google.com/mapfiles/marker_green.png"},
-            {position: [49.28952958093682, -1.1501188139848408]},
-            {position: [44.28952958093682, -1.1501188139848408]}
-          ],
           cb: function (markers) {
             if (markers.length > 1) { // 1 marker stay unchanged (because cb returns nothing)
               if (markers.length < 20) {
@@ -52,9 +49,23 @@ $(document).ready(function() {
               };
             }
           }
-      });
-	  
-	  
-	  
+      }).then(function(cluster) {
+			addMarker(map, cluster, {
+				position: uluru
+			}, "text1");
+			addMarker(map, cluster, {
+				position: {lat: 48.8620722, lng: 2.352047}
+			}, "text2");
+			addMarker(map, cluster, {
+				position: {lat: 44.28952958093682, lng: 6.152559438984804}
+			}, "text3");
+			addMarker(map, cluster, {
+				position: {lat: 49.28952958093682, lng: -1.1501188139848408}
+			}, "text4");
+			addMarker(map, cluster, {
+				position: {lat: 44.28952958093682, lng: -1.1501188139848408}
+			}, "text5");
+	  });
+	 
 	var socket = io();
 });
