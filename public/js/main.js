@@ -8,6 +8,10 @@ function addMarker(map, cluster, marker, content) {
 			marker.addListener('click', function(event, data) {
 				infowindow.open(map, this);
 			});
+			marker["custom"] = {
+				'map' : map,
+				'infowindow' : infowindow
+			};
 		});
 		
 		cluster.add(marker);
@@ -47,7 +51,13 @@ $(document).ready(function() {
                 x: -33,
                 y: -33
               };
-            }
+            } else if (markers.length == 1) {
+				var marker = markers[0];
+				var data = marker["custom"];
+				var iw = data["infowindow"];
+				var map = data["map"];
+				iw.open(map, marker);
+			}
           }
       }).then(function(cluster) {
 			addMarker(map, cluster, {
