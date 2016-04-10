@@ -65,6 +65,8 @@ function cluster(map, class1, class2, class3, clusterCallback) {
 	}).then(clusterCallback);
 }
 
+var LOC_CLUSTER = null;
+
 function initMap(position) {
 
     var map = $('#map')
@@ -73,28 +75,57 @@ function initMap(position) {
         center: position
       });
 	  
-	cluster(map, "cluster-1", "cluster-2", "cluster-3", function(cluster) {
-		addMarker(map, cluster, {
-			position: position
-		}, "<div class='infowindow request'>text1</div>");
-		addMarker(map, cluster, {
-			position: {lat: 48.8620722, lng: 2.352047}
-		}, "<div class='infowindow teach'>text2</div>");
-		addMarker(map, cluster, {
-			position: {lat: 44.28952958093682, lng: 6.152559438984804}
-		}, "text3");
-		addMarker(map, cluster, {
-			position: {lat: 49.28952958093682, lng: -1.1501188139848408}
-		}, "text4");
-		addMarker(map, cluster, {
-			position: {lat: 44.28952958093682, lng: -1.1501188139848408}
-		}, "text5");
-	});
+	  
+	  
+	var getLoc = function() {
+		// TODO remove this cluster
+		if (LOC_CLUSTER) {
+			
+		}
+		cluster(map, "cluster-1", "cluster-2", "cluster-3", function(cluster) {
+			LOC_CLUSTER = cluster;
+			getLocations(position, function(data) {
+				if (data.status == 'ok') {
+					var array = data.data;
+					for(var i=0; i<array.length; i+=1) {
+						addMarker(map, cluster, {
+							position: array[i].pos
+						}, "<div class='infowindow " + array[1].type + "'>" + array[1].text + "</div>");
+					}
+				}
+			});
+		});
+	};
+	setInterval(function() {
+		getLoc();
+	}, 1000*60);
+	getLoc();
+	
+	
+	
 	 
 	setInterval(function() {
 		setInfoWindow("request");
 		setInfoWindow("teach");
 	}, 100);
+}
+
+function getLocations(position, callback) {
+	$.ajax({
+		type: 'POST',
+		url: 'getlocations',
+		dataType: 'json',
+		data: position,
+		beforeSend:function(){
+
+		},
+		success:function(data){
+			callback(data);
+		},
+		error:function(jqXHR, textStatus, errorThrown){
+			alert("error");
+		}
+	});
 }
 
 $(document).ready(function() {
