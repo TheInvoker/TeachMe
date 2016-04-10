@@ -28,6 +28,43 @@ function setInfoWindow(name) {
 	}
 }
 
+function cluster(map, class1, class2, class3, clusterCallback) {
+	map.cluster({
+		size: 200,
+		cb: function (markers) {
+		if (markers.length > 1) { // 1 marker stay unchanged (because cb returns nothing)
+		  if (markers.length < 20) {
+			return {
+			  content: "<div class='cluster " + class1 + "'>" + markers.length + "</div>",
+			  x: -26,
+			  y: -26
+			};
+		  }
+		  if (markers.length < 50) {
+			return {
+			  content: "<div class='cluster " + class2 + "'>" + markers.length + "</div>",
+			  x: -26,
+			  y: -26
+			};
+		  }
+		  return {
+			content: "<div class='cluster " + class3 + "'>" + markers.length + "</div>",
+			x: -33,
+			y: -33
+		  };
+		} else if (markers.length == 1) {
+			var marker = markers[0];
+			if ("custom" in marker) {
+				var data = marker["custom"];
+				var iw = data["infowindow"];
+				var map = data["map"];
+				iw.open(map, marker);
+			}
+		}
+	  }
+	}).then(clusterCallback);
+}
+
 function initMap(position) {
 
     var map = $('#map')
@@ -36,56 +73,23 @@ function initMap(position) {
         center: position
       });
 	  
-      map.cluster({
-          size: 200,
-          cb: function (markers) {
-            if (markers.length > 1) { // 1 marker stay unchanged (because cb returns nothing)
-              if (markers.length < 20) {
-                return {
-                  content: "<div class='cluster cluster-1'>" + markers.length + "</div>",
-                  x: -26,
-                  y: -26
-                };
-              }
-              if (markers.length < 50) {
-                return {
-                  content: "<div class='cluster cluster-2'>" + markers.length + "</div>",
-                  x: -26,
-                  y: -26
-                };
-              }
-              return {
-                content: "<div class='cluster cluster-3'>" + markers.length + "</div>",
-                x: -33,
-                y: -33
-              };
-            } else if (markers.length == 1) {
-				var marker = markers[0];
-				if ("custom" in marker) {
-					var data = marker["custom"];
-					var iw = data["infowindow"];
-					var map = data["map"];
-					iw.open(map, marker);
-				}
-			}
-          }
-      }).then(function(cluster) {
-			addMarker(map, cluster, {
-				position: position
-			}, "<div class='infowindow request'>text1</div>");
-			addMarker(map, cluster, {
-				position: {lat: 48.8620722, lng: 2.352047}
-			}, "<div class='infowindow teach'>text2</div>");
-			addMarker(map, cluster, {
-				position: {lat: 44.28952958093682, lng: 6.152559438984804}
-			}, "text3");
-			addMarker(map, cluster, {
-				position: {lat: 49.28952958093682, lng: -1.1501188139848408}
-			}, "text4");
-			addMarker(map, cluster, {
-				position: {lat: 44.28952958093682, lng: -1.1501188139848408}
-			}, "text5");
-	  });
+	cluster(map, "cluster-1", "cluster-2", "cluster-3", function(cluster) {
+		addMarker(map, cluster, {
+			position: position
+		}, "<div class='infowindow request'>text1</div>");
+		addMarker(map, cluster, {
+			position: {lat: 48.8620722, lng: 2.352047}
+		}, "<div class='infowindow teach'>text2</div>");
+		addMarker(map, cluster, {
+			position: {lat: 44.28952958093682, lng: 6.152559438984804}
+		}, "text3");
+		addMarker(map, cluster, {
+			position: {lat: 49.28952958093682, lng: -1.1501188139848408}
+		}, "text4");
+		addMarker(map, cluster, {
+			position: {lat: 44.28952958093682, lng: -1.1501188139848408}
+		}, "text5");
+	});
 	 
 	setInterval(function() {
 		setInfoWindow("request");
