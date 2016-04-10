@@ -18,6 +18,16 @@ function addMarker(map, cluster, marker, content) {
 	});
 }
 
+function setInfoWindow(name) {
+	var items = $("." + name + ".infowindow");
+	if (items.length > 0) {
+		var parents = items.parent().parent().parent().prev().find("div").last();
+		if (!parents.hasClass(name)) {
+			parents.addClass(name);
+		}
+	}
+}
+
 $(document).ready(function() {
 	
 	var uluru = {lat: -25.363, lng: 131.044};
@@ -53,19 +63,21 @@ $(document).ready(function() {
               };
             } else if (markers.length == 1) {
 				var marker = markers[0];
-				var data = marker["custom"];
-				var iw = data["infowindow"];
-				var map = data["map"];
-				iw.open(map, marker);
+				if ("custom" in marker) {
+					var data = marker["custom"];
+					var iw = data["infowindow"];
+					var map = data["map"];
+					iw.open(map, marker);
+				}
 			}
           }
       }).then(function(cluster) {
 			addMarker(map, cluster, {
 				position: uluru
-			}, "text1");
+			}, "<div class='infowindow request'>text1</div>");
 			addMarker(map, cluster, {
 				position: {lat: 48.8620722, lng: 2.352047}
-			}, "text2");
+			}, "<div class='infowindow teach'>text2</div>");
 			addMarker(map, cluster, {
 				position: {lat: 44.28952958093682, lng: 6.152559438984804}
 			}, "text3");
@@ -76,6 +88,11 @@ $(document).ready(function() {
 				position: {lat: 44.28952958093682, lng: -1.1501188139848408}
 			}, "text5");
 	  });
+	 
+	setInterval(function() {
+		setInfoWindow("request");
+		setInfoWindow("teach");
+	}, 100);
 	 
 	var socket = io();
 });
