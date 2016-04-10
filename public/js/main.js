@@ -1,18 +1,21 @@
 function addMarker(map, cluster, marker, content) {
 	map.marker(marker).then(function(marker) {
-		map.infowindow({
-			'content' : content
-		})
-		.then(function (infowindow) {
-			var map = this.get(0);
-			marker.addListener('click', function(event, data) {
-				infowindow.open(map, this);
+		
+		if (content != null) {
+			map.infowindow({
+				'content' : content
+			})
+			.then(function (infowindow) {
+				var map = this.get(0);
+				marker.addListener('click', function(event, data) {
+					infowindow.open(map, this);
+				});
+				marker["custom"] = {
+					'map' : map,
+					'infowindow' : infowindow
+				};
 			});
-			marker["custom"] = {
-				'map' : map,
-				'infowindow' : infowindow
-			};
-		});
+		}
 		
 		cluster.add(marker);
 	});
@@ -115,8 +118,9 @@ function initMap(position) {
 				for(var i=0; i<array.length; i+=1) {
 					var pos = array[i].store.coordinates;
 					addMarker(map, cluster, {
-						position: {'lat' : pos.latitude, 'lng':pos.longitude}
-					}, "<div class='infowindow store'>Starbucks</div>");
+						position: {'lat' : pos.latitude, 'lng':pos.longitude},
+						icon : "image/starbucks.png"
+					}, null);
 				}
 			},
 			error:function(jqXHR, textStatus, errorThrown){
