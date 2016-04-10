@@ -28,14 +28,12 @@ function setInfoWindow(name) {
 	}
 }
 
-$(document).ready(function() {
-	
-	var uluru = {lat: -25.363, lng: 131.044};
-	
+function initMap(position) {
+
     var map = $('#map')
       .gmap3({
-        zoom: 4,
-        center: uluru
+        zoom: 13,
+        center: position
       });
 	  
       map.cluster({
@@ -73,7 +71,7 @@ $(document).ready(function() {
           }
       }).then(function(cluster) {
 			addMarker(map, cluster, {
-				position: uluru
+				position: position
 			}, "<div class='infowindow request'>text1</div>");
 			addMarker(map, cluster, {
 				position: {lat: 48.8620722, lng: 2.352047}
@@ -93,6 +91,46 @@ $(document).ready(function() {
 		setInfoWindow("request");
 		setInfoWindow("teach");
 	}, 100);
-	 
+}
+
+$(document).ready(function() {
 	var socket = io();
+	
+	var defLocation = {'lat': 43.6532, 'lng': 79.3832};
+	
+	if ( navigator.geolocation ) {
+
+		// Find the users current position.  Cache the location for 5 minutes, timeout after 6 seconds
+		navigator.geolocation.getCurrentPosition(function (pos) {
+
+			initMap({'lat':pos.coords.latitude, 'lng':pos.coords.longitude});
+
+		}, function (error) {
+			
+			initMap(defLocation);
+			
+			switch(error.code) {
+				case error.PERMISSION_DENIED:
+					alert("Could not get your location. User denied the request for Geolocation.");
+					break;
+				case error.POSITION_UNAVAILABLE:
+					alert("Could not get your location. Location information is unavailable.");
+					break;
+				case error.TIMEOUT:
+					alert("Could not get your location. The request to get user location timed out.");
+					break;
+				case error.UNKNOWN_ERROR:
+					alert("Could not get your location. An unknown error occurred.");
+					break;
+				default:
+					alert("Could not get your location. An unknown error occurred.");
+			}
+		}, {
+			maximumAge: 500000, 
+			enableHighAccuracy:true, 
+			timeout: 6000
+		});
+	} else {
+		initMap(defLocation);
+	}
 });

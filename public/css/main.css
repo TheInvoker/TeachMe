@@ -46,16 +46,16 @@ html,body {
 	margin-right:0.2em;
 }
 .request:not(.infowindow) {
-    background: orange; /* For browsers that do not support gradients */
-    background: -webkit-linear-gradient(orange, white); /* For Safari 5.1 to 6.0 */
-    background: -o-linear-gradient(orange, white); /* For Opera 11.1 to 12.0 */
-    background: -moz-linear-gradient(orange, white); /* For Firefox 3.6 to 15 */
-    background: linear-gradient(orange, white); /* Standard syntax */
+    background: #FDC255; /* For browsers that do not support gradients */
+    background: -webkit-linear-gradient(#FDC255, white); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(#FDC255, white); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(#FDC255, white); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(#FDC255, white); /* Standard syntax */
 }
 .teach:not(.infowindow) {
-    background: green; /* For browsers that do not support gradients */
-    background: -webkit-linear-gradient(green, white); /* For Safari 5.1 to 6.0 */
-    background: -o-linear-gradient(green, white); /* For Opera 11.1 to 12.0 */
-    background: -moz-linear-gradient(green, white); /* For Firefox 3.6 to 15 */
-    background: linear-gradient(green, white); /* Standard syntax */
+    background: #6CEA6C; /* For browsers that do not support gradients */
+    background: -webkit-linear-gradient(#6CEA6C, white); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(#6CEA6C, white); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(#6CEA6C, white); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(#6CEA6C, white); /* Standard syntax */
 }
