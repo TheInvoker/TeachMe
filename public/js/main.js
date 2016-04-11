@@ -23,12 +23,12 @@ function addMarker(map, cluster, marker, content) {
 
 function setInfoWindow(name) {
 	var items = $("." + name + ".infowindow");
-	if (items.length > 0) {
-		var parents = items.parent().parent().parent().prev().find("div").last();
-		if (!parents.hasClass(name)) {
-			parents.addClass(name);
-		}
-	}
+	items.each(function(i,x) {
+		var parent = $(x).parent().parent().parent().prev().find("div").last();
+		if (!parent.hasClass(name)) {
+			parent.addClass(name);
+		}	
+	});
 }
 
 function cluster(map, class1, class2, class3, clusterCallback) {
@@ -93,7 +93,7 @@ function initMap(position) {
 					for(var i=0; i<array.length; i+=1) {
 						addMarker(map, cluster, {
 							position: array[i].pos
-						}, "<div class='infowindow " + array[1].type + "'>" + array[1].text + "</div>");
+						}, "<div class='infowindow " + array[i].type + "'>" + array[i].text + "</div>");
 					}
 				}
 			});
@@ -133,7 +133,6 @@ function initMap(position) {
 	setInterval(function() {
 		setInfoWindow("request");
 		setInfoWindow("teach");
-		setInfoWindow("store");
 	}, 100);
 }
 
@@ -190,7 +189,7 @@ $(document).ready(function() {
 		}, {
 			maximumAge: 500000, 
 			enableHighAccuracy:true, 
-			timeout: 6000
+			timeout: 12000
 		});
 	} else {
 		initMap(defLocation);
