@@ -43,7 +43,7 @@ html,body {
 
 
 .infowindow {
-	margin-right:0.2em;
+	margin-right:0.5em;
 }
 .request:not(.infowindow) {
     background: #FDC255; /* For browsers that do not support gradients */
