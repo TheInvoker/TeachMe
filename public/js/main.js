@@ -82,9 +82,10 @@ function initMap(position) {
       });
 	  
 	  
-	var a = function(cluster) {
+	cluster(map, "cluster-1", "cluster-2", "cluster-3", function(cluster) {
 		for(var i=0; i<LOC_LIST.length; i+=1) {
 			cluster.remove(LOC_LIST[i]);
+			map.remove(LOC_LIST[i]);
 		}
 		LOC_LIST = [];
 		
@@ -100,16 +101,12 @@ function initMap(position) {
 				}
 			}
 		});
-	};
-	cluster(map, "cluster-1", "cluster-2", "cluster-3", function(cluster) {
-		a(cluster);
-		setInterval(a, 1000*60, cluster);
 	});
 
-	
-	var b = function(cluster) {
+	cluster(map, "cluster-1", "cluster-2", "cluster-3", function(cluster) {
 		for(var i=0; i<SB_LIST.length; i+=1) {
 			cluster.remove(SB_LIST[i]);
+			map.remove(SB_LIST[i]);
 		}
 		SB_LIST = [];
 		
@@ -136,10 +133,6 @@ function initMap(position) {
 				alert("error");
 			}
 		});
-	};
-	cluster(map, "cluster-1", "cluster-2", "cluster-3", function(cluster) {
-		b(cluster);
-		setInterval(b, 1000*60, cluster);
 	});
 
 	 
@@ -147,6 +140,10 @@ function initMap(position) {
 		setInfoWindow("request");
 		setInfoWindow("teach");
 	}, 100);
+	
+	setTimeout(function() {
+		window.location = window.location;
+	}, 1000*60);
 }
 
 function getLocations(position, callback) {
