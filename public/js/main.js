@@ -1,6 +1,9 @@
-function addMarker(map, cluster, marker, content) {
+var LOC_LIST = [];
+var SB_LIST = [];
+
+function addMarker(map, cluster, marker, content, markerCB) {
 	map.marker(marker).then(function(marker) {
-		
+		markerCB(marker);
 		if (content != null) {
 			map.infowindow({
 				'content' : content
@@ -68,7 +71,7 @@ function cluster(map, class1, class2, class3, clusterCallback) {
 	}).then(clusterCallback);
 }
 
-var LOC_CLUSTER = null;
+
 
 function initMap(position) {
 
@@ -79,33 +82,37 @@ function initMap(position) {
       });
 	  
 	  
-	  
-	var getLoc = function() {
-		// TODO remove this cluster
-		if (LOC_CLUSTER) {
-			
+	var a = function(cluster) {
+		for(var i=0; i<LOC_LIST.length; i+=1) {
+			cluster.remove(LOC_LIST[i]);
 		}
-		cluster(map, "cluster-1", "cluster-2", "cluster-3", function(cluster) {
-			LOC_CLUSTER = cluster;
-			getLocations(position, function(data) {
-				if (data.status == 'ok') {
-					var array = data.data;
-					for(var i=0; i<array.length; i+=1) {
-						addMarker(map, cluster, {
-							position: array[i].pos
-						}, "<div class='infowindow " + array[i].type + "'>" + array[i].text + "</div>");
-					}
+		LOC_LIST = [];
+		
+		getLocations(position, function(data) {
+			if (data.status == 'ok') {
+				var array = data.data;
+				for(var i=0; i<array.length; i+=1) {
+					addMarker(map, cluster, {
+						position: array[i].pos
+					}, "<div class='infowindow " + array[i].type + "'>" + array[i].text + "</div>", function(marker) {
+						LOC_LIST.push(marker);
+					});
 				}
-			});
+			}
 		});
 	};
-	setInterval(function() {
-		getLoc();
-	}, 1000*60);
-	getLoc();
-	
-	
 	cluster(map, "cluster-1", "cluster-2", "cluster-3", function(cluster) {
+		a(cluster);
+		setInterval(a, 1000*60, cluster);
+	});
+
+	
+	var b = function(cluster) {
+		for(var i=0; i<SB_LIST.length; i+=1) {
+			cluster.remove(SB_LIST[i]);
+		}
+		SB_LIST = [];
+		
 		$.ajax({
 			type: 'GET',
 			url: 'https://openapi.starbucks.com/location/v1/stores?radius=10&limit=50&brandCode=SBUX&latLng=' + position.lat + '%2C' + position.lng + '&apikey=7b35m595vccu6spuuzu2rjh4',
@@ -120,13 +127,19 @@ function initMap(position) {
 					addMarker(map, cluster, {
 						position: {'lat' : pos.latitude, 'lng':pos.longitude},
 						icon : "image/starbucks.png"
-					}, null);
+					}, null, function(marker) {
+						SB_LIST.push(marker);
+					});
 				}
 			},
 			error:function(jqXHR, textStatus, errorThrown){
 				alert("error");
 			}
 		});
+	};
+	cluster(map, "cluster-1", "cluster-2", "cluster-3", function(cluster) {
+		b(cluster);
+		setInterval(b, 1000*60, cluster);
 	});
 
 	 
