@@ -6,7 +6,8 @@ function addMarker(map, cluster, marker, content, markerCB) {
 		markerCB(marker);
 		if (content != null) {
 			map.infowindow({
-				'content' : content
+				'content' : content,
+				'disableAutoPan' : true
 			})
 			.then(function (infowindow) {
 				var map = this.get(0);
@@ -21,7 +22,6 @@ function addMarker(map, cluster, marker, content, markerCB) {
 		}
 		
 		cluster.add(marker);
-		cluster.remove(marker);
 	});
 }
 
