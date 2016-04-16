@@ -98,7 +98,9 @@ function initMap() {
 						var array = data.data;
 						for(var i=0; i<array.length; i+=1) {
 							addMarker(map, cluster, {
-								position: array[i].pos
+								position: array[i].pos,
+								clickable : false,
+								draggable : false
 							}, "<div class='infowindow " + array[i].type + "'>" + array[i].text + "</div>", function(marker) {
 								LOC_LIST.push(marker);
 							});
@@ -132,7 +134,9 @@ function initMap() {
 						var pos = array[i].store.coordinates;
 						addMarker(map, cluster, {
 							position: {'lat' : pos.latitude, 'lng':pos.longitude},
-							icon : "image/starbucks.png"
+							icon : "image/starbucks.png",
+							clickable : false,
+							draggable : false
 						}, null, function(marker) {
 							SB_LIST.push(marker);
 						});
