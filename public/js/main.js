@@ -21,6 +21,7 @@ function addMarker(map, cluster, marker, content, markerCB) {
 		}
 		
 		cluster.add(marker);
+		cluster.remove(marker);
 	});
 }
 
@@ -73,77 +74,86 @@ function cluster(map, class1, class2, class3, clusterCallback) {
 
 
 
-function initMap(position) {
+function initMap() {
 
-    var map = $('#map')
-      .gmap3({
-        zoom: 13,
-        center: position
-      });
-	  
-	  
-	cluster(map, "cluster-1", "cluster-2", "cluster-3", function(cluster) {
-		for(var i=0; i<LOC_LIST.length; i+=1) {
-			cluster.remove(LOC_LIST[i]);
-			map.remove(LOC_LIST[i]);
-		}
-		LOC_LIST = [];
+	getCurrentLocation(function(position) {
 		
-		getLocations(position, function(data) {
-			if (data.status == 'ok') {
-				var array = data.data;
-				for(var i=0; i<array.length; i+=1) {
-					addMarker(map, cluster, {
-						position: array[i].pos
-					}, "<div class='infowindow " + array[i].type + "'>" + array[i].text + "</div>", function(marker) {
-						LOC_LIST.push(marker);
-					});
-				}
-			}
-		});
-	});
-
-	cluster(map, "cluster-1", "cluster-2", "cluster-3", function(cluster) {
-		for(var i=0; i<SB_LIST.length; i+=1) {
-			cluster.remove(SB_LIST[i]);
-			map.remove(SB_LIST[i]);
-		}
-		SB_LIST = [];
+		var map = $('#map')
+		  .gmap3({
+			zoom: 13,
+			center: position
+		  });
+		  
 		
-		$.ajax({
-			type: 'GET',
-			url: 'https://openapi.starbucks.com/location/v1/stores?radius=10&limit=50&brandCode=SBUX&latLng=' + position.lat + '%2C' + position.lng + '&apikey=7b35m595vccu6spuuzu2rjh4',
-			dataType: 'json',
-			headers: {
-				'Accept': 'application/json'
-			},
-			success: function(storesData) {
-				var array = storesData.items;
-				for(var i=0; i<array.length; i+=1) {
-					var pos = array[i].store.coordinates;
-					addMarker(map, cluster, {
-						position: {'lat' : pos.latitude, 'lng':pos.longitude},
-						icon : "image/starbucks.png"
-					}, null, function(marker) {
-						SB_LIST.push(marker);
-					});
-				}
-			},
-			error:function(jqXHR, textStatus, errorThrown){
-				alert("error");
+		var a = function(cluster) {
+			for(var i=0; i<LOC_LIST.length; i+=1) {
+				cluster.remove(LOC_LIST[i]);
+				LOC_LIST[i].setMap(null);
 			}
+			LOC_LIST = [];
+			
+			getCurrentLocation(function(position) {
+				getLocations(position, function(data) {
+					if (data.status == 'ok') {
+						var array = data.data;
+						for(var i=0; i<array.length; i+=1) {
+							addMarker(map, cluster, {
+								position: array[i].pos
+							}, "<div class='infowindow " + array[i].type + "'>" + array[i].text + "</div>", function(marker) {
+								LOC_LIST.push(marker);
+							});
+						}
+					}
+				});
+			});
+		};
+		cluster(map, "cluster-1", "cluster-2", "cluster-3", function(cluster) {
+			a(cluster);
+			setInterval(a, 60 * 1000, cluster);
 		});
-	});
 
-	 
-	setInterval(function() {
-		setInfoWindow("request");
-		setInfoWindow("teach");
-	}, 100);
+		var b = function(cluster) {
+			for(var i=0; i<SB_LIST.length; i+=1) {
+				cluster.remove(SB_LIST[i]);
+				SB_LIST[i].setMap(null);
+			}
+			SB_LIST = [];
+			
+			$.ajax({
+				type: 'GET',
+				url: 'https://openapi.starbucks.com/location/v1/stores?radius=10&limit=50&brandCode=SBUX&latLng=' + position.lat + '%2C' + position.lng + '&apikey=7b35m595vccu6spuuzu2rjh4',
+				dataType: 'json',
+				headers: {
+					'Accept': 'application/json'
+				},
+				success: function(storesData) {
+					var array = storesData.items;
+					for(var i=0; i<array.length; i+=1) {
+						var pos = array[i].store.coordinates;
+						addMarker(map, cluster, {
+							position: {'lat' : pos.latitude, 'lng':pos.longitude},
+							icon : "image/starbucks.png"
+						}, null, function(marker) {
+							SB_LIST.push(marker);
+						});
+					}
+				},
+				error:function(jqXHR, textStatus, errorThrown){
+					alert("error");
+				}
+			});
+		};
+		cluster(map, "cluster-1", "cluster-2", "cluster-3", function(cluster) {
+			b(cluster);
+			setInterval(b, 60 * 1000, cluster);
+		});
+
+		setInterval(function() {
+			setInfoWindow("request");
+			setInfoWindow("teach");
+		}, 100);
 	
-	setTimeout(function() {
-		window.location = window.location;
-	}, 1000*60);
+	});
 }
 
 function getLocations(position, callback) {
@@ -164,9 +174,7 @@ function getLocations(position, callback) {
 	});
 }
 
-$(document).ready(function() {
-	var socket = io();
-	
+function getCurrentLocation(callback) {
 	var defLocation = {'lat': 43.6532, 'lng': 79.3832};
 	
 	if ( navigator.geolocation ) {
@@ -174,11 +182,11 @@ $(document).ready(function() {
 		// Find the users current position.  Cache the location for 5 minutes, timeout after 6 seconds
 		navigator.geolocation.getCurrentPosition(function (pos) {
 
-			initMap({'lat':pos.coords.latitude, 'lng':pos.coords.longitude});
+			callback({'lat':pos.coords.latitude, 'lng':pos.coords.longitude});
 			
 		}, function (error) {
 			
-			initMap(defLocation);
+			callback(defLocation);
 			
 			switch(error.code) {
 				case error.PERMISSION_DENIED:
@@ -202,6 +210,11 @@ $(document).ready(function() {
 			timeout: 12000
 		});
 	} else {
-		initMap(defLocation);
+		callback(defLocation);
 	}
+}
+
+$(document).ready(function() {
+	var socket = io();
+	initMap();
 });
