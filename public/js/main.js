@@ -18,6 +18,7 @@ function addMarker(map, cluster, marker, content, markerCB) {
 					'map' : map,
 					'infowindow' : infowindow
 				};
+				infowindow.open(map, marker);
 			});
 		}
 		
