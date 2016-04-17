@@ -18,7 +18,6 @@ function addMarker(map, cluster, marker, content, markerCB) {
 					'map' : map,
 					'infowindow' : infowindow
 				};
-				infowindow.open(map, marker);
 			});
 		}
 		
@@ -40,7 +39,7 @@ function cluster(map, class1, class2, class3, clusterCallback) {
 	map.cluster({
 		size: 200,
 		cb: function (markers) {
-		if (markers.length > 1) { // 1 marker stay unchanged (because cb returns nothing)
+		if (markers.length > 1) { // 1 marker stay unchanged (because cb returns nothing)	  
 		  if (markers.length < 20) {
 			return {
 			  content: "<div class='cluster " + class1 + "'>" + markers.length + "</div>",
