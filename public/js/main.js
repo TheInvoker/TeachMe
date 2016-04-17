@@ -138,7 +138,7 @@ function initMap() {
 	
 	setInterval(function() {
 		getCurrentLocation(updatePosition);
-	}, 1000);
+	}, 60 * 1000);
 	
 	getCurrentLocation(function(position) {
 		updatePosition(position);
